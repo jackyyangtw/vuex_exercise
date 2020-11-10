@@ -2,6 +2,8 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import axios from 'axios'
 
+import productsModules from './products'
+import cartsModules from './carts'
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -9,8 +11,6 @@ export default new Vuex.Store({
   strict: true,
   state:{
     isLoading: false,
-    products: [],
-    categories: [],
   },
   //操作行為，不操作資料狀態
   actions: {
@@ -18,32 +18,53 @@ export default new Vuex.Store({
     updateLoading(context,status){
       context.commit('LOADING',status)
     },
-    getProducts(context) {
-      const url = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/products/all`;
-      context.commit('LOADING',true)
-      axios.get(url).then((response) => {
-        context.commit('PRODUCTS',response.data.products)
-        context.commit('CATEGORIES',response.data.products)
-        console.log('取得產品列表:', response);
-        context.commit('LOADING',false)
-      });
-    },
+    // getCart(context) {
+    //   context.commit('LOADING',true)
+    //   const url = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/cart`;
+    //   axios.get(url).then((response) => {
+    //     if (response.data.data.carts) {
+    //       context.commit('CART',response.data.data)
+    //     }
+    //     context.commit('LOADING',false)
+    //     console.log('取得購物車', response.data.data);
+    //   });
+    // },
+    // removeCart(context,id) {
+    //   const url = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/cart/${id}`;
+    //   context.commit('LOADING',true)
+    //   axios.delete(url).then((response) => {
+    //     context.commit('LOADING',false)
+    //     //調用
+    //     context.dispatch('getCart')
+    //     console.log('刪除購物車項目', response);
+    //   });
+    // },
+    // //{id, qty} 預設只能傳兩個參數，如果要傳三個，必須用物件包起來
+    // addtoCart(context,{id, qty}) {
+    //   const url = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/cart`;
+    //   context.commit('LOADING',true)
+    //   const item = {
+    //     product_id: id,
+    //     qty,
+    //   };
+    //   axios.post(url, { data: item }).then((response) => {
+    //     context.commit('LOADING',false)
+    //     context.dispatch('getCart')
+    //     console.log('加入購物車:', response);
+    //   });
+    // },
   },
+  //寫入資料
   //操作狀態，可用常數命名(大寫)，state是上方的state
   //不可執行非同步狀態(ajax、settimeout等等)，會造成state和payload不相等，造成除錯困難
   mutations: {
     LOADING(state,status){
       state.isLoading = status;
+      console.log("這是status",status)
     },
-    PRODUCTS(state,payload){
-      state.products = payload;
-    },
-    CATEGORIES(state,payload){
-      const categories = new Set();
-      payload.forEach((item) => {
-        categories.add(item.category);
-      });
-      state.categories = Array.from(categories);
-    }
+  },
+  modules:{
+    productsModules,
+    cartsModules
   }
 })

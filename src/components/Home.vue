@@ -68,6 +68,8 @@
 </template>
 
 <script>
+import { mapGetters,mapActions } from 'vuex'
+
 export default {
   name: 'Home',
   data() {
@@ -86,39 +88,27 @@ export default {
       }
       return this.products;
     },
-    categories(){
-      return this.$store.state.categories
-    },
-    products(){
-      return this.$store.state.products
-    }
+    //從 store/index.js回傳資料
+    // categories(){
+    //   return this.$store.state.categories
+    // },
+    // products(){
+    //   return this.$store.state.products
+    // }
+    ...mapGetters('productsModules',['categories','products']),
   },
   methods: {
-    getProducts() {
-      this.$store.dispatch('getProducts')
-    },
-    addtoCart(id, qty = 1) {
-      const vm = this;
-      const url = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/cart`;
-      vm.$store.dispatch('updateLoading',true)
-      const item = {
-        product_id: id,
-        qty,
-      };
-      vm.$store.state.isLoading = true;
-      this.$http.post(url, { data: item }).then((response) => {
-        vm.$store.dispatch('updateLoading',false)
-        console.log('加入購物車:', response);
-      });
-    },
-    getUnique() {
-      const vm = this;
-      const categories = new Set();
-      vm.products.forEach((item) => {
-        categories.add(item.category);
-      });
-      vm.categories = Array.from(categories);
-    },
+    // getProducts() {
+    //   //調用store/index.js的方法
+    //   this.$store.dispatch('getProducts')
+    // },
+    ...mapActions('productsModules',['getProducts']),
+    ...mapActions('cartsModules',['addtoCart']),
+    // addtoCart(id, qty = 1) {
+    //   //加上productsModules才能讀到products，因為products在products.js裡面的state，是區域變數
+    //   console.log(this.$store.state.productsModules.products)
+    //   this.$store.dispatch('addtoCart',{id,qty})
+    // },
   },
   created() {
     this.getProducts();
